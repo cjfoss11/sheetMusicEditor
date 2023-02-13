@@ -18,7 +18,6 @@ import music.*;
 import recognizer.*;
 
 public class MusicView extends JComponent implements MouseListener, MouseMotionListener, KeyListener{
-    //variable initialization
     public List<Staff> staves = new ArrayList<Staff>(4);
     public List<Note> notesAndRests = new ArrayList<Note>();
     public Note selectedNote;
@@ -34,7 +33,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
     public int index;
     public int steps;
     public Note item;
-    //constructor
+
     public MusicView() {
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -85,7 +84,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
     }
 
     //called when a new staff is needed
-    public void newStaff() {
+    protected void newStaff() {
         staves.get(this.staves.size() - 1).setLastStaff(false);
         Staff staff = new Staff(true, 20, 150 *this.staves.size() + 50);
         staves.add(this.staves.size(), staff);
@@ -97,7 +96,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
     }
 
     //called when a staff deletion is needed
-    public void deleteStaff() {
+    protected void deleteStaff() {
         if (this.staves.size() > 1) {
             this.staves.remove(this.staves.get(this.staves.size() - 1));
             this.staves.get(this.staves.size() - 1).setLastStaff(true);
@@ -107,15 +106,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
         repaint();
     }
 
-    public void nearestStaff(Note note) {
-        for (int i = 0; i < staves.size(); i++){
-            if (note.getY() + note.note.getHeight(null) >= staves.get(i).getY() - 24 && note.getY() <= staves.get(i).getY() + 72) {
-                note.setStaff(staves.get(i));
-            }
-        }
-    }
-
-    public ArrayList<Note> orderList(List<Staff> staves, List<Note> notesAndRests) {
+    private ArrayList<Note> orderList(List<Staff> staves, List<Note> notesAndRests) {
         Map<Staff, ArrayList<Note>> map = new HashMap<Staff, ArrayList<Note>>();
         ArrayList<Note> orderedList = new ArrayList<Note>();
         for (int i = 0; i < notesAndRests.size(); i++) {
@@ -148,7 +139,8 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
         }
         return orderedList;
     }
-    public void timerStart() {
+
+    protected void timerStart() {
         orderedList = orderList(staves, notesAndRests);
         item = orderedList.get(0);
         ballX = orderedList.get(0).getX();
@@ -193,7 +185,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
         repaint();
     }
 
-    public void timerEnd() {
+    protected void timerEnd() {
         timer = new Timer(10, null);
         travel = 0;
         index = 0;
@@ -201,6 +193,78 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
         item = orderedList.get(0);
         ballX = orderedList.get(0).getX();
         ballY = orderedList.get(0).getY() - 80;
+    }
+
+    private void recognize() {
+        Result result = recognizer.recognize(stroke);
+        if (result.getName() != "No match") {
+            if (result.getName() == "circle") {
+                notesAndRests.add(new Note(4, "note", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
+                notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
+            } else if (result.getName() == "half note") {
+                notesAndRests.add(new Note(3, "note", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
+                notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
+            } else if (result.getName() == "quarter note") {
+                notesAndRests.add(new Note(2, "note", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
+                notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
+            } else if (result.getName() == "eighth note") {
+                notesAndRests.add(new Note(1, "note", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
+                notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
+            } else if (result.getName() == "sixteenth note") {
+                notesAndRests.add(new Note(0, "note", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
+                notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
+            } else if (result.getName() == "rectangle") {
+                notesAndRests.add(new Note(4, "rest", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
+                notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
+            } else if (result.getName() == "half rest") {
+                notesAndRests.add(new Note(3, "rest", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
+                notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
+            } else if (result.getName() == "right curly brace") {
+                notesAndRests.add(new Note(2, "rest", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
+                notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
+            } else if (result.getName() == "eighth rest") {
+                notesAndRests.add(new Note(1, "rest", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
+                notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
+            } else if (result.getName() == "sixteenth rest") {
+                notesAndRests.add(new Note(0, "rest", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
+                notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
+            } else if (result.getName() == "flat") {
+                for (int i = 0; i < this.notesAndRests.size(); i++) {
+                    if (this.notesAndRests.get(i).type == "note") {
+                        int height = this.notesAndRests.get(i).note.getHeight(null);
+                        int width = this.notesAndRests.get(i).note.getWidth(null);
+                        int xCoord = this.notesAndRests.get(i).x;
+                        int yCoord = this.notesAndRests.get(i).y;
+                        
+                        //assign accidental to a note
+                        if (((int)stroke.get(0).getX() >= xCoord && (int)stroke.get(0).getX() <= xCoord + width) && ((int) stroke.get(0).getY() >= yCoord && (int) stroke.get(0).getY() <= yCoord + height)) {
+                            this.notesAndRests.get(i).setAccidental(new Accidental("flat", (int)stroke.get(0).getX(), (int) stroke.get(0).getY()));
+                            this.notesAndRests.get(i).accidental.setX(xCoord - 10);
+                            this.notesAndRests.get(i).accidental.setY(yCoord + 20);
+                            break;
+                        }
+                    }
+                }
+            } else if (result.getName() == "star") {
+                for (int i = 0; i < this.notesAndRests.size(); i++) {
+                    if (this.notesAndRests.get(i).type == "note") {
+                        int height = this.notesAndRests.get(i).note.getHeight(null);
+                        int width = this.notesAndRests.get(i).note.getWidth(null);
+                        int xCoord = this.notesAndRests.get(i).x;
+                        int yCoord = this.notesAndRests.get(i).y;
+                        
+                        //assign accidental to a note
+                        if (((int)stroke.get(0).getX() >= xCoord && (int)stroke.get(0).getX() <= xCoord + width) && ((int) stroke.get(0).getY() >= yCoord && (int) stroke.get(0).getY() <= yCoord + height)) {
+                            this.notesAndRests.get(i).setAccidental(new Accidental("sharp", (int)stroke.get(0).getX(), (int) stroke.get(0).getY()));
+                            this.notesAndRests.get(i).accidental.setX(xCoord - 10);
+                            this.notesAndRests.get(i).accidental.setY(yCoord + 20);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        stroke = new ArrayList<Point2D>(); 
     }
 
     public void mouseDragged(MouseEvent e) {
@@ -217,6 +281,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
 
                 //set pitch based on type of note to get ledger lines
                 Note currNote = this.notesAndRests.get(0);
+
                 if (currNote.duration == 0) {
                     currNote.setPitch(e.getY() + 35);
                 } else if (currNote.duration == 1) {
@@ -230,7 +295,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                 }
 
                 //reassign associated staff if necessary
-                nearestStaff(this.notesAndRests.get(0));
+                Staff.nearestStaff(this.notesAndRests.get(0), this.staves);
 
                 //chords
                 for (int i = 1; i < this.notesAndRests.size(); i++) {
@@ -263,7 +328,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                         this.selectedNote.setPitch(e.getY() + 6);
                     }
                     //reassign associated staff if necessary
-                    nearestStaff(this.selectedNote);
+                    Staff.nearestStaff(this.selectedNote, this.staves);
 
                     //move associated accidental with note as necessary
                     if (this.selectedNote.accidental != null) {
@@ -359,7 +424,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                 }
                 //reassign associated staff if necessary
                 if (this.selectedNote != null) {
-                    nearestStaff(this.selectedNote);  
+                    Staff.nearestStaff(this.selectedNote, this.staves);  
                 }
             //in pen mode
             } else {
@@ -388,7 +453,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                     currNote.setPitch(e.getY() + 6);
                 }
                 //reassign associated staff if necessary
-                nearestStaff(currNote);
+                Staff.nearestStaff(currNote, this.staves);
             //adding accidentals
             } else if (this.currAccidental != null && RadioBtns.accidentalType != null) {
                 for (int i = 0; i < this.notesAndRests.size(); i++) {
@@ -406,87 +471,17 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                         }
                     }
                 }
-
                 for (int i = 0; i < this.notesAndRests.size(); i++) {
                     this.notesAndRests.get(i).isSelected = false;
                 }
             }
-            
         } else if (!EditBtns.selectBtn.isEnabled()) {
             //reassign associated staff if necessary
             if (this.selectedNote != null) {
-                nearestStaff(this.selectedNote);
+                Staff.nearestStaff(this.selectedNote, this.staves);
             }
         } else {
-            Result result = recognizer.recognize(stroke);
-            if (result.getName() != "No match") {
-                if (result.getName() == "circle") {
-                    notesAndRests.add(new Note(4, "note", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
-                    notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                } else if (result.getName() == "half note") {
-                    notesAndRests.add(new Note(3, "note", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
-                    notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                } else if (result.getName() == "quarter note") {
-                    notesAndRests.add(new Note(2, "note", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
-                    notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                } else if (result.getName() == "eighth note") {
-                    notesAndRests.add(new Note(1, "note", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
-                    notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                } else if (result.getName() == "sixteenth note") {
-                    notesAndRests.add(new Note(0, "note", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
-                    notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                } else if (result.getName() == "rectangle") {
-                    notesAndRests.add(new Note(4, "rest", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
-                    notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                } else if (result.getName() == "half rest") {
-                    notesAndRests.add(new Note(3, "rest", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
-                    notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                } else if (result.getName() == "right curly brace") {
-                    notesAndRests.add(new Note(2, "rest", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
-                    notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                } else if (result.getName() == "eighth rest") {
-                    notesAndRests.add(new Note(1, "rest", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
-                    notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                } else if (result.getName() == "sixteenth rest") {
-                    notesAndRests.add(new Note(0, "rest", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
-                    notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                } else if (result.getName() == "flat") {
-                    for (int i = 0; i < this.notesAndRests.size(); i++) {
-                        if (this.notesAndRests.get(i).type == "note") {
-                            int height = this.notesAndRests.get(i).note.getHeight(null);
-                            int width = this.notesAndRests.get(i).note.getWidth(null);
-                            int xCoord = this.notesAndRests.get(i).x;
-                            int yCoord = this.notesAndRests.get(i).y;
-                            
-                            //assign accidental to a note
-                            if (((int)stroke.get(0).getX() >= xCoord && (int)stroke.get(0).getX() <= xCoord + width) && ((int) stroke.get(0).getY() >= yCoord && (int) stroke.get(0).getY() <= yCoord + height)) {
-                                this.notesAndRests.get(i).setAccidental(new Accidental("flat", (int)stroke.get(0).getX(), (int) stroke.get(0).getY()));
-                                this.notesAndRests.get(i).accidental.setX(xCoord - 10);
-                                this.notesAndRests.get(i).accidental.setY(yCoord + 20);
-                                break;
-                            }
-                        }
-                    }
-                } else if (result.getName() == "star") {
-                    for (int i = 0; i < this.notesAndRests.size(); i++) {
-                        if (this.notesAndRests.get(i).type == "note") {
-                            int height = this.notesAndRests.get(i).note.getHeight(null);
-                            int width = this.notesAndRests.get(i).note.getWidth(null);
-                            int xCoord = this.notesAndRests.get(i).x;
-                            int yCoord = this.notesAndRests.get(i).y;
-                            
-                            //assign accidental to a note
-                            if (((int)stroke.get(0).getX() >= xCoord && (int)stroke.get(0).getX() <= xCoord + width) && ((int) stroke.get(0).getY() >= yCoord && (int) stroke.get(0).getY() <= yCoord + height)) {
-                                this.notesAndRests.get(i).setAccidental(new Accidental("sharp", (int)stroke.get(0).getX(), (int) stroke.get(0).getY()));
-                                this.notesAndRests.get(i).accidental.setX(xCoord - 10);
-                                this.notesAndRests.get(i).accidental.setY(yCoord + 20);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            stroke = new ArrayList<Point2D>();
+            recognize();
         }
         this.currAccidental = null;
         repaint();
@@ -511,8 +506,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                         }
                     }
                     this.selectedAccidental = null;
-                }
-                
+                }  
             }
             repaint();
         }
