@@ -17,8 +17,21 @@ public class EditBtns extends JPanel{
         container = new JPanel();
 		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
-		//creating grouping of "Select" and "Pen" buttons and their functions
-		JPanel editContainer = new JPanel();
+		
+        JPanel editContainer = createBasicButtons(musicView);
+		JPanel staffContainer = createStaffButtons(musicView);
+		JPanel playContainer = createPlayBackButtons(musicView);
+
+		//adding to overall container
+		container.add(editContainer);
+		container.add(staffContainer);
+		container.add(playContainer);
+
+        createSlider();
+    }
+
+    public JPanel createBasicButtons(MusicView musicView) {
+        JPanel editContainer = new JPanel();
 		editContainer.setLayout(new BoxLayout(editContainer, BoxLayout.X_AXIS));
 		
 		addBtn.setEnabled(false);
@@ -50,9 +63,30 @@ public class EditBtns extends JPanel{
 		editContainer.add(addBtn);
 		editContainer.add(penBtn);
 
-		//creating grouping of "New Staff" and "Delete Staff" buttons and their functions
-		JPanel staffContainer = new JPanel();
-		staffContainer.setLayout(new BoxLayout(staffContainer, BoxLayout.X_AXIS));
+        return editContainer;
+    }
+    
+    public static JSlider createSlider() {
+        slider = new JSlider(JSlider.VERTICAL, 0, 4, 0);
+		//creating labels for type of note and assigning labels a place on slider
+		Hashtable<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
+		labels.put( 0, new JLabel("Sixteenth") );
+		labels.put( 1, new JLabel("Eighth") );
+		labels.put( 2, new JLabel("Quarter") );
+		labels.put( 3, new JLabel("Half") );
+		labels.put( 4, new JLabel("Whole") );
+
+		//setting slider attributes
+		slider.setLabelTable( labels );
+		slider.setPaintLabels(true);
+		slider.setMaximumSize(new Dimension(100, 200));
+		slider.setSnapToTicks(true);
+		return slider;
+	}
+
+    public JPanel createStaffButtons(MusicView musicView) {
+        JPanel staffContainer = new JPanel();
+        staffContainer.setLayout(new BoxLayout(staffContainer, BoxLayout.X_AXIS));
 		JButton newBtn = new JButton("New Staff");
 		newBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -73,8 +107,11 @@ public class EditBtns extends JPanel{
 		staffContainer.add(newBtn);
 		staffContainer.add(deleteBtn);
 
-		//creating grouping of "Play" and "Stop" buttons and their functions
-		JPanel playContainer = new JPanel();
+        return staffContainer;
+    }
+
+    public JPanel createPlayBackButtons(MusicView musicView) {
+        JPanel playContainer = new JPanel();
 		playContainer.setLayout(new BoxLayout(playContainer, BoxLayout.X_AXIS));
 		playBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -95,31 +132,8 @@ public class EditBtns extends JPanel{
 		playContainer.add(playBtn);
 		playContainer.add(stopBtn);
 
-		//adding to overall container
-		container.add(editContainer);
-		container.add(staffContainer);
-		container.add(playContainer);
-
-        createSlider();
+        return playContainer;
     }
-
-    public static JSlider createSlider() {
-        slider = new JSlider(JSlider.VERTICAL, 0, 4, 0);
-		//creating labels for type of note and assigning labels a place on slider
-		Hashtable<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
-		labels.put( 0, new JLabel("Sixteenth") );
-		labels.put( 1, new JLabel("Eighth") );
-		labels.put( 2, new JLabel("Quarter") );
-		labels.put( 3, new JLabel("Half") );
-		labels.put( 4, new JLabel("Whole") );
-
-		//setting slider attributes
-		slider.setLabelTable( labels );
-		slider.setPaintLabels(true);
-		slider.setMaximumSize(new Dimension(100, 200));
-		slider.setSnapToTicks(true);
-		return slider;
-	}
 
     public JPanel getPanel() {
         return this.container;
