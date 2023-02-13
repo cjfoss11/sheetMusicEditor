@@ -3,9 +3,9 @@ import javax.swing.*;
 import gui.*;
 import gui.Menu;
 import gui.TextArea;
+import gui.MusicView;
 
-
-public class Homework5 {
+public class Main {
 	static MusicView musicView = new MusicView();
 	
 	//creating control panel and setting its attributes
