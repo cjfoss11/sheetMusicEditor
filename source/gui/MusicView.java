@@ -1,3 +1,4 @@
+package gui;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -13,6 +14,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
 import java.util.Comparator;
+import music.*;
+import recognizer.*;
 
 public class MusicView extends JComponent implements MouseListener, MouseMotionListener, KeyListener{
     //variable initialization
@@ -160,7 +163,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                         ballY = item.y - 100;
                         ballX = item.x;
                     } catch (IndexOutOfBoundsException f) {
-                        Homework5.playBtn.setSelected(false);
+                        EditBtns.playBtn.setSelected(false);
                         timer.stop();
                         timerEnd();
                     }
@@ -208,7 +211,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
         
         } else {
             //in add mode, adding notes/rests
-            if (!Homework5.addBtn.isEnabled() && this.notesAndRests.size() > 0) {
+            if (!EditBtns.addBtn.isEnabled() && this.notesAndRests.size() > 0) {
                 this.notesAndRests.get(0).setX(e.getX());
                 this.notesAndRests.get(0).setY(e.getY());
 
@@ -242,7 +245,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                     }
                 }
             //in select mode
-            } else if (!Homework5.selectBtn.isEnabled()) {
+            } else if (!EditBtns.selectBtn.isEnabled()) {
                 if (this.selectedNote != null && this.selectedNote.isSelected) {
                     this.selectedNote.setX(e.getX());
                     this.selectedNote.setY(e.getY());
@@ -296,10 +299,10 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
     public void mousePressed(MouseEvent e) {
         requestFocusInWindow();
             //in add mode
-            if (!Homework5.addBtn.isEnabled()) {
+            if (!EditBtns.addBtn.isEnabled()) {
                 //adding notes and rests
-                if (Homework5.noteType != null) {
-                    Note newNote = new Note(Homework5.slider.getValue(), Homework5.noteType, e.getX(), e.getY());
+                if (RadioBtns.noteType != null) {
+                    Note newNote = new Note(EditBtns.slider.getValue(), RadioBtns.noteType, e.getX(), e.getY());
                     this.notesAndRests.add(0, newNote);
                     for (int i = 0; i < staves.size(); i++){
                         if (newNote.getY() + newNote.note.getHeight(null) >= staves.get(i).getY() - 24 && newNote.getY() <= staves.get(i).getY() + 72) {
@@ -307,9 +310,9 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                         }
                     }
                 //adding accidentals
-                } else if (Homework5.accidentalType != null) {
+                } else if (RadioBtns.accidentalType != null) {
                     if (this.notesAndRests.size() >= 1) {
-                        Accidental accidental = new Accidental(Homework5.accidentalType, e.getX(), e.getY());
+                        Accidental accidental = new Accidental(RadioBtns.accidentalType, e.getX(), e.getY());
                         this.currAccidental = accidental;
                         //set all notes to selected for dragging accidentals 
                         for (int i = 0; i < this.notesAndRests.size(); i++) {
@@ -320,7 +323,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                     }
                 }
             //in select mode
-            } else if (!Homework5.selectBtn.isEnabled()) {
+            } else if (!EditBtns.selectBtn.isEnabled()) {
                 //determining what is selected
                 for (int i = 0; i < this.notesAndRests.size(); i++) {
                     int height = this.notesAndRests.get(i).note.getHeight(null);
@@ -368,9 +371,9 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
 
     public void mouseReleased(MouseEvent e) {
         //add mode 
-        if (!Homework5.addBtn.isEnabled()) {
+        if (!EditBtns.addBtn.isEnabled()) {
             //adding notes
-            if (this.notesAndRests.size() > 0 && this.notesAndRests.get(0).type == "note" && Homework5.noteType != null){
+            if (this.notesAndRests.size() > 0 && this.notesAndRests.get(0).type == "note" && RadioBtns.noteType != null){
                 //set pitch based on type of note to get ledger lines
                 Note currNote = this.notesAndRests.get(0);
                 if (currNote.duration == 0) {
@@ -386,9 +389,8 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                 }
                 //reassign associated staff if necessary
                 nearestStaff(currNote);
-                Homework5.label.setText(currNote.pitch);
             //adding accidentals
-            } else if (this.currAccidental != null && Homework5.accidentalType != null) {
+            } else if (this.currAccidental != null && RadioBtns.accidentalType != null) {
                 for (int i = 0; i < this.notesAndRests.size(); i++) {
                     if (this.notesAndRests.get(i).type == "note") {
                         int height = this.notesAndRests.get(i).note.getHeight(null);
@@ -410,7 +412,7 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                 }
             }
             
-        } else if (!Homework5.selectBtn.isEnabled()) {
+        } else if (!EditBtns.selectBtn.isEnabled()) {
             //reassign associated staff if necessary
             if (this.selectedNote != null) {
                 nearestStaff(this.selectedNote);
@@ -421,43 +423,33 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                 if (result.getName() == "circle") {
                     notesAndRests.add(new Note(4, "note", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
                     notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                    Homework5.label.setText(String.format("Whole note detected at %s", this.notesAndRests.get(notesAndRests.size() - 1).pitch));
                 } else if (result.getName() == "half note") {
                     notesAndRests.add(new Note(3, "note", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
                     notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                    Homework5.label.setText(String.format("Half note detected at %s", this.notesAndRests.get(notesAndRests.size() - 1).pitch));
                 } else if (result.getName() == "quarter note") {
                     notesAndRests.add(new Note(2, "note", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
                     notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                    Homework5.label.setText(String.format("Quarter note detected at %s", this.notesAndRests.get(notesAndRests.size() - 1).pitch));
                 } else if (result.getName() == "eighth note") {
                     notesAndRests.add(new Note(1, "note", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
                     notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                    Homework5.label.setText(String.format("Eighth note detected at %s", this.notesAndRests.get(notesAndRests.size() - 1).pitch));
                 } else if (result.getName() == "sixteenth note") {
                     notesAndRests.add(new Note(0, "note", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
                     notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                    Homework5.label.setText(String.format("Sixteenth note detected at %s", this.notesAndRests.get(notesAndRests.size() - 1).pitch));
                 } else if (result.getName() == "rectangle") {
                     notesAndRests.add(new Note(4, "rest", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
                     notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                    Homework5.label.setText(String.format("Whole rest detected at %s", this.notesAndRests.get(notesAndRests.size() - 1).pitch));
                 } else if (result.getName() == "half rest") {
                     notesAndRests.add(new Note(3, "rest", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
                     notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                    Homework5.label.setText(String.format("Half rest detected at %s", this.notesAndRests.get(notesAndRests.size() - 1).pitch));
                 } else if (result.getName() == "right curly brace") {
                     notesAndRests.add(new Note(2, "rest", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
                     notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                    Homework5.label.setText(String.format("Quarter rest detected at %s", this.notesAndRests.get(notesAndRests.size() - 1).pitch));
                 } else if (result.getName() == "eighth rest") {
                     notesAndRests.add(new Note(1, "rest", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
                     notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                    Homework5.label.setText(String.format("Eighth rest detected at %s", this.notesAndRests.get(notesAndRests.size() - 1).pitch));
                 } else if (result.getName() == "sixteenth rest") {
                     notesAndRests.add(new Note(0, "rest", (int) stroke.get(0).getX(), (int) stroke.get(0).getY()));
                     notesAndRests.get(notesAndRests.size() - 1).setPitch((int)stroke.get(0).getY());
-                    Homework5.label.setText(String.format("Sixteenth rest detected at %s", this.notesAndRests.get(notesAndRests.size() - 1).pitch));
                 } else if (result.getName() == "flat") {
                     for (int i = 0; i < this.notesAndRests.size(); i++) {
                         if (this.notesAndRests.get(i).type == "note") {
@@ -472,8 +464,6 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                                 this.notesAndRests.get(i).accidental.setX(xCoord - 10);
                                 this.notesAndRests.get(i).accidental.setY(yCoord + 20);
                                 break;
-                            } else if (i == this.notesAndRests.size() - 1) {
-                                Homework5.label.setText("Flat detected, but not within a note");
                             }
                         }
                     }
@@ -491,14 +481,10 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                                 this.notesAndRests.get(i).accidental.setX(xCoord - 10);
                                 this.notesAndRests.get(i).accidental.setY(yCoord + 20);
                                 break;
-                            } else if (i == this.notesAndRests.size() - 1) {
-                                Homework5.label.setText("Sharp detected, but not within a note");
                             }
                         }
                     }
                 }
-            } else {
-                Homework5.label.setText("No match");
             }
             stroke = new ArrayList<Point2D>();
         }
@@ -512,11 +498,10 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                 //remove a note
                 if (selectedNote != null) {
                     this.notesAndRests.remove(selectedNote);
-                    Homework5.label.setText("Note Deleted");
                     if (this.notesAndRests.size() == 0) {
-                        Homework5.selectBtn.setEnabled(true);
-                        Homework5.penBtn.setEnabled(true);
-                        Homework5.addBtn.setEnabled(false);
+                        EditBtns.selectBtn.setEnabled(true);
+                        EditBtns.penBtn.setEnabled(true);
+                        EditBtns.addBtn.setEnabled(false);
                     }
                 //remove an accidental
                 } else if (selectedAccidental != null) {
@@ -526,7 +511,6 @@ public class MusicView extends JComponent implements MouseListener, MouseMotionL
                         }
                     }
                     this.selectedAccidental = null;
-                    Homework5.label.setText("Accidental Deleted");
                 }
                 
             }

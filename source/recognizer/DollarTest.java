@@ -1,3 +1,4 @@
+package recognizer;
 /**
  * The $1 Unistroke Recognizer
  *
@@ -71,7 +72,6 @@
 
 
 import javax.swing.*;
-import javax.swing.event.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -91,7 +91,6 @@ class Canvas extends JPanel {
 		Graphics2D g2 = (Graphics2D) g;
 		
 		// get the last template result we matched, if there was one.
-		Result result = test.getLastResult();
 		
 		if (points == null) 
 			return;
@@ -209,7 +208,6 @@ public class DollarTest extends JFrame implements MouseListener, MouseMotionList
 	}
 	
 	public static void main(String[] args) {
-		DollarTest dt = new DollarTest();
 	}
 	
 }

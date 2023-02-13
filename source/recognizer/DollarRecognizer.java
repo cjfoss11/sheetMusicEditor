@@ -1,3 +1,4 @@
+package recognizer;
 /**
  * The $1 Unistroke Recognizer
  *
@@ -71,9 +72,7 @@
 
 
 import java.util.ArrayList;
-import java.util.Vector;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.geom.*;
 
 public class DollarRecognizer {
