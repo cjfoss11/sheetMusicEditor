@@ -1,9 +1,11 @@
+package music;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 public class Staff extends JComponent{
     //variable initialization
@@ -46,6 +48,14 @@ public class Staff extends JComponent{
             
         }
        
+    }
+
+    public static void nearestStaff(Note note, List<Staff> staves) {
+        for (int i = 0; i < staves.size(); i++){
+            if (note.getY() + note.note.getHeight(null) >= staves.get(i).getY() - 24 && note.getY() <= staves.get(i).getY() + 72) {
+                note.setStaff(staves.get(i));
+            }
+        }
     }
 
     //getters and setters

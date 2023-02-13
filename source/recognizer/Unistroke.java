@@ -1,3 +1,4 @@
+package recognizer;
 /**
  * The $1 Unistroke Recognizer
  *
@@ -139,7 +140,6 @@ public class Unistroke {
 	}
 		
 	static ArrayList<Point2D> resample(ArrayList<Point2D> origPoints, int n) {
-		int origSize = origPoints.size();
 		double intervalLength = pathLength(origPoints) / (n-1); // interval length
 		double D = 0.0;
 		ArrayList<Point2D> points = new ArrayList<Point2D>();

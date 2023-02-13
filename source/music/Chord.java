@@ -1,3 +1,4 @@
+package music;
 public class Chord {
     public Note note1;
     public Note note2;

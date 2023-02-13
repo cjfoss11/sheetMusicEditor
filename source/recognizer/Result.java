@@ -1,3 +1,4 @@
+package recognizer;
 /**
  * The $1 Unistroke Recognizer
  *
@@ -74,7 +75,6 @@ import java.awt.Rectangle;
 public class Result {
 	private String name;
 	private double score;
-	private Rectangle boundingBox;
 	private Unistroke candidate, matchedTemplate;
 	
 	public Result(String name, double score) {

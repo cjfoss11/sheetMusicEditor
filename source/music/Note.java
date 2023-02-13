@@ -1,3 +1,4 @@
+package music;
 import java.awt.*;
 import java.net.URL;
 import java.util.ArrayList;
@@ -159,16 +160,8 @@ public class Note {
     //set accidental and change status bar 
     public void setAccidental(Accidental sAccidental) {
         if (sAccidental != null) {
-            if (this.accidental == null) {
-                Homework5.label.setText(String.format("Note changed from %1$s to %2$s %3$s", this.pitch, this.pitch, sAccidental.flatOrSharp));  
-            } else {
-                Homework5.label.setText(String.format("Note changed from %1$s %2$s to %3$s %4$s", this.pitch, this.accidental.flatOrSharp, this.pitch, sAccidental.flatOrSharp));  
-            }
             this.accidental = sAccidental;
         } else {
-            if (this.accidental != null) {
-                Homework5.label.setText(String.format("Note changed from %1$s %2$s to %3$s", this.pitch, this.accidental.flatOrSharp, this.pitch));
-            }
             this.accidental = null;
         }
        
